@@ -6,7 +6,7 @@ MAINTAINER Jian Li <gunine@sk.com>
 ENV HOME /root
 ENV BUILD_NUMBER docker
 ENV JAVA_TOOL_OPTIONS=-Dfile.encoding=UTF8
-ENV ONOS_VERSION 1.13.1
+ENV ONOS_VERSION 1.13.0
 
 # Install dependencies
 RUN apt-get update && apt-get install -y git
@@ -20,6 +20,12 @@ RUN cp -R onos /src/
 RUN rm -rf /src/onos/apps/openstacknetworking
 RUN rm -rf /src/onos/apps/openstacknode
 RUN rm -rf /src/onos/apps/openstacknetworkingui
+RUN rm -rf /src/onos/apps/openstacktelemetry
+
+# Download SONA buck definition file
+RUN git clone https://github.com/sonaproject/onos-sona-buck-defs.git buck-defs
+RUN cp buck-defs/sona.defs /src/onos/
+RUN sed -i 's/modules.defs/sona.defs/g' /src/onos/onos.defs
 
 # Download and patch ONOS core changes which affect ONOS
 RUN git clone https://github.com/sonaproject/onos-sona-patch.git patch
@@ -34,6 +40,7 @@ RUN git checkout master
 RUN cp -R apps/openstacknetworking ../src/onos/apps
 RUN cp -R apps/openstacknode ../src/onos/apps
 RUN cp -R apps/openstacknetworkingui ../src/onos/apps
+RUN cp -R apps/openstacktelemetry ../src/onos/apps
 
 # Build ONOS
 # We extract the tar in the build environment to avoid having to put the tar
